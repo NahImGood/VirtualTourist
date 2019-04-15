@@ -11,11 +11,14 @@ import MapKit
 import CoreData
 
 class MapViewController: UIViewController, UIGestureRecognizerDelegate {
-    
+    //MARK: Outlets
     @IBOutlet weak var mapView: MKMapView!
-    
-    var dataController: DataController!
+    //MARK: Variables
+    let delegate = UIApplication.shared.delegate as! AppDelegate
     var fetchedResultController:NSFetchedResultsController<Pin>!
+    var annotations: [MKAnnotation] = [MKAnnotation]()
+    var pins: [Pin] = [Pin]()
+    var selectedPin: Pin?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,10 +41,9 @@ extension MapViewController {
     
     @objc func handleLongPress(gestureReconizer: UILongPressGestureRecognizer) {
         if gestureReconizer.state != UIGestureRecognizer.State.ended {
-            let touchLocation = gestureReconizer.location(in: mapView)
-            let locationCoordinate = mapView.convert(touchLocation,toCoordinateFrom: mapView)
-            print("Tapped at lat: \(locationCoordinate.latitude) long: \(locationCoordinate.longitude)")
-            FlickerApi.getImagesFromLatLon(lat:locationCoordinate.latitude, long: locationCoordinate.longitude, completion: handleImagesFromLatLon(images:error:lat:long:))
+            let touchPoint: CGPoint = gestureReconizer.location(in: mapView)
+            let touchCoordinate: CLLocationCoordinate2D = mapView.convert(touchPoint, toCoordinateFrom: mapView)
+            mapView.addAnnotation(createPin(touchCoordinate))
             return
         }
         if gestureReconizer.state != UIGestureRecognizer.State.began {
@@ -50,50 +52,44 @@ extension MapViewController {
     }
 
 }
+
 //MARK: Saving of pin
 extension MapViewController {
     
-    func handleImagesFromLatLon(images: [FlickerPhoto]?, error: Error?, lat: Double, long: Double){
-        //Convert FlickerPhoto to Pin
-        
-        var pin = Pin(context: dataController.viewContext)
-        pin.latitude = lat
-        pin.longitude = long
-        
-        print(pin)
-        
+    func createPin(_ location: CLLocationCoordinate2D) -> Pin {
+        let dataController = delegate.dataController
+        let pin: Pin = Pin(latitude: location.latitude, longitude: location.longitude, dataController.viewContext)
+        try? dataController.viewContext.save()
+        selectedPin = pin
+        performSegue(withIdentifier: "detail", sender: self)
+        return pin
     }
     
-    func fetchImages(images: [FlickerPhoto]) -> [UIImage] {
-        
-        var image = [UIImage]()
-        let group = DispatchGroup()
-        let serialQueue = DispatchQueue(label: "serialQueue")
-        
-        var URLArray = fetchImageUrlList(urls: images)
-        
-        return image
-        
-    }
-    
-    func getImagesFromUrl(urls: [URL]) -> [UIImage]{
-        var images: [UIImage] = []
-        for url in urls {
-            print(url)
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if (segue.identifier == "detail") {
+            let collectionVC = segue.destination as! PhotoCollectionViewController
+            collectionVC.selectedPin = self.selectedPin
         }
-        return images
     }
     
-    func fetchImageUrlList(urls: [FlickerPhoto])-> [URL]{
-        var i = 0
-        var returnedUrls: [URL] = []
-        while i < urls.count {
-           returnedUrls.append(urls[i].flickerURL)
-        }
-        print(returnedUrls)
-        print(returnedUrls)
-        return returnedUrls
+    func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
+        mapView.deselectAnnotation(view.annotation, animated: false)
+        selectedPin = view.annotation as? Pin
+        performSegue(withIdentifier: "detail", sender: self)
+    }
+    
+    func fetchPins() -> [Pin] {
+        let dataController = delegate.dataController
+        var pins = [Pin]()
+        let fetchResult: NSFetchRequest<NSFetchRequestResult> = Pin.fetchRequest()
         
+        do {
+            let results = try dataController.viewContext.fetch(fetchResult) as! [Pin]
+            pins = results
+        } catch let e as NSError {
+            print("Error while trying to perform a search: \n\(e)")
+        }
+        
+        return pins
     }
-    
 }

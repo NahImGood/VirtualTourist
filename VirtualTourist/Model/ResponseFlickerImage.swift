@@ -29,9 +29,9 @@ struct FlickerPhoto: Decodable {
     let server: String
     let title: String
     
-    var flickerURL: URL {
+    var flickerURL: String {
         get {
-            return URL(string: "https://farm\(farm).staticflickr.com/\(server)/\(self.id)_\(secret).jpg")!
+            return "https://farm\(farm).staticflickr.com/\(server)/\(self.id)_\(secret).jpg"
         }
     }
     

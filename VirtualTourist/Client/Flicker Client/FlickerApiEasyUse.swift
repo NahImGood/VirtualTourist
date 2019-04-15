@@ -9,9 +9,11 @@
 import Foundation
 import UIKit
 
-extension FlickerApi {
+class FlickerApi {
     
-    class func getImagesFromLatLon(lat: Double, long: Double, completion: @escaping(_ result: [Pin]?, Error?, Double, Double)-> Void){
+     func getImagesFromLatLon(pin: Pin, lat: Double, long: Double, completion: @escaping(_ result: [Photo]?, Error?)-> Void){
+        let delegate = UIApplication.shared.delegate as! AppDelegate
+        let dataController = delegate.dataController
         let method: String = FlickerAPIConst.Methods.Search
         
         let boxLatLeft = lat - 1
@@ -32,16 +34,18 @@ extension FlickerApi {
         taskForGETMethod(method, parameters: parameters) { (results, error) in
             guard let results = results else {
                 print("Error: GetImagesFromLatLon threw error nil data")
-                completion(nil, error, lat, long)
+                completion(nil, error)
                 return
             }
             var photos: [Photo] = [Photo]()
             for result in results {
-                
+                let photo = Photo(title: result.title, flickrId: result.id, flickrUrl: result.flickerURL, data: nil, dataController.viewContext )
+                photo.pin = pin
+                photos.append(photo)
             }
             
-            print(result)
-            completion(result, nil, lat, long)
+            print(photos)
+            completion(photos, nil)
             
         }
         

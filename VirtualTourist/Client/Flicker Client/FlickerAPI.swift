@@ -9,11 +9,11 @@
 import Foundation
 
 
-class FlickerApi {
+extension FlickerApi {
     
 
     //TODO: Return an object of FlickerPhoto
-    class func taskForGETMethod(_ method: String, parameters: [String : AnyObject], completion: @escaping (_ result: [FlickerPhoto]?, _ error: Error?) -> Void) -> URLSessionDataTask {
+     func taskForGETMethod(_ method: String, parameters: [String : AnyObject], completion: @escaping (_ result: [FlickerPhoto]?, _ error: Error?) -> Void) -> URLSessionDataTask {
         var parametersWithApiKey = parameters
         parametersWithApiKey[FlickerAPIConst.ParameterKeys.Method] = method as AnyObject
         parametersWithApiKey[FlickerAPIConst.ParameterKeys.Callback] = "1" as AnyObject
@@ -28,14 +28,14 @@ class FlickerApi {
                 return
             }
             print(data)
-            serializeDataFromGet(data: data, completion: completion)
+            self.serializeDataFromGet(data: data, completion: completion)
         }
         task.resume()
         return task
     }
     
     //Serialize the FLicker Image Type Instead. 
-    class func serializeDataFromGet(data: Data, completion:@escaping(_ result: [FlickerPhoto]?, Error?)-> Void){
+     func serializeDataFromGet(data: Data, completion:@escaping(_ result: [FlickerPhoto]?, Error?)-> Void){
         
         let jsonDecoder = JSONDecoder()
         do {
@@ -57,7 +57,7 @@ class FlickerApi {
     }
     
     
-    class func flickrURLFromParameters(_ parameters: [String:AnyObject], withPathExtension: String? = nil) -> URL {
+     func flickrURLFromParameters(_ parameters: [String:AnyObject], withPathExtension: String? = nil) -> URL {
         var components = URLComponents()
         components.scheme = FlickerAPIConst.Constants.ApiScheme
         components.host = FlickerAPIConst.Constants.ApiHost
