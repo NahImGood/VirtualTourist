@@ -2,8 +2,8 @@
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="14490.98" systemVersion="18E226" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="Photo" representedClassName="Photo" syncable="YES">
         <attribute name="data" optional="YES" attributeType="Binary" syncable="YES"/>
-        <attribute name="flickerId" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="flickerUrl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="flickrId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="flickrUrl" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="pin" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Pin" inverseName="photos" inverseEntity="Pin" syncable="YES"/>
     </entity>
@@ -13,7 +13,7 @@
         <relationship name="photos" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Photo" inverseName="pin" inverseEntity="Photo" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Photo" positionX="241.05859375" positionY="42.8828125" width="128" height="118"/>
+        <element name="Photo" positionX="241.05859375" positionY="42.8828125" width="128" height="120"/>
         <element name="Pin" positionX="-45" positionY="0" width="128" height="88"/>
     </elements>
 </model>

@@ -11,7 +11,7 @@ import UIKit
 
 class FlickerApi {
     
-     func getImagesFromLatLon(pin: Pin, lat: Double, long: Double, completion: @escaping(_ result: [Photo]?, Error?)-> Void){
+     class func getImagesFromLatLon(pin: Pin, lat: Double, long: Double, completion: @escaping(_ result: [Photo]?, Error?)-> Void){
         let delegate = UIApplication.shared.delegate as! AppDelegate
         let dataController = delegate.dataController
         let method: String = FlickerAPIConst.Methods.Search
@@ -37,17 +37,35 @@ class FlickerApi {
                 completion(nil, error)
                 return
             }
-            var photos: [Photo] = [Photo]()
+            var photos: [Photo] = []
+            print("Result Count \(results.count)")
             for result in results {
-                let photo = Photo(title: result.title, flickrId: result.id, flickrUrl: result.flickerURL, data: nil, dataController.viewContext )
+            let photo: Photo = Photo(title: result.title, flickrId: result.id, flickrUrl: result.flickerURL, data: nil, dataController.viewContext )
                 photo.pin = pin
                 photos.append(photo)
             }
-            
-            print(photos)
             completion(photos, nil)
-            
         }
+    }
+    
+    class func getImagesFromURL(filePath: String, completion: @escaping (_ imageData: Data?, _ error: Error?) -> Void) -> URLSessionTask {
+        let url = URL(string: filePath)!
+        
+        var task = URLSession.shared.dataTask(with: url) { (data, response, error) in
+            guard let data = data else {
+                print("GETTASKFROMRURL: ----- Unable to get images")
+                completion(nil, error)
+                return
+            }
+            guard let statusCode = (response as? HTTPURLResponse)?.statusCode, statusCode >= 200 && statusCode <= 299 else {
+                print("Your request returned a status code other than 2xx!")
+                completion(nil, error)
+                return
+            }
+            completion(data, nil)
+        }
+        task.resume()
+        return task
         
     }
     

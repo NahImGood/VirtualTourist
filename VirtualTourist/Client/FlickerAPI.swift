@@ -13,7 +13,7 @@ extension FlickerApi {
     
 
     //TODO: Return an object of FlickerPhoto
-     func taskForGETMethod(_ method: String, parameters: [String : AnyObject], completion: @escaping (_ result: [FlickerPhoto]?, _ error: Error?) -> Void) -> URLSessionDataTask {
+     class func taskForGETMethod(_ method: String, parameters: [String : AnyObject], completion: @escaping (_ result: [FlickerPhoto]?, _ error: Error?) -> Void) -> URLSessionDataTask {
         var parametersWithApiKey = parameters
         parametersWithApiKey[FlickerAPIConst.ParameterKeys.Method] = method as AnyObject
         parametersWithApiKey[FlickerAPIConst.ParameterKeys.Callback] = "1" as AnyObject
@@ -35,7 +35,7 @@ extension FlickerApi {
     }
     
     //Serialize the FLicker Image Type Instead. 
-     func serializeDataFromGet(data: Data, completion:@escaping(_ result: [FlickerPhoto]?, Error?)-> Void){
+     class func serializeDataFromGet(data: Data, completion:@escaping(_ result: [FlickerPhoto]?, Error?)-> Void){
         
         let jsonDecoder = JSONDecoder()
         do {
@@ -57,7 +57,7 @@ extension FlickerApi {
     }
     
     
-     func flickrURLFromParameters(_ parameters: [String:AnyObject], withPathExtension: String? = nil) -> URL {
+     class func flickrURLFromParameters(_ parameters: [String:AnyObject], withPathExtension: String? = nil) -> URL {
         var components = URLComponents()
         components.scheme = FlickerAPIConst.Constants.ApiScheme
         components.host = FlickerAPIConst.Constants.ApiHost
